@@ -1,0 +1,187 @@
+---
+title: "atividade-1"
+author: "Ebenézer Dorneles"
+date: "2025-10-18"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Uma indústria produz grandes quantidades de alumina ($Al_2O_3$ de elevado teor de pureza) para fabricação de alumínio metálico. A matéria prima de fabricação é a bauxita, um mineral com cerca de 55% de óxido de alumínio ($Al_2O_3$). No processo de produção da alumina, o teor de $Na_2O$ (óxido de sódio) ocluído no produto é um fator importante do ponto de vista da qualidade da alumina fabricada. O $Na_2O$ é uma impureza e, portanto, é desejável que o seu teor seja o mais baixo possível. Com o objetivo de minimizar o teor da $Na_2O$ ocluído no produto durante a etapa de precipitação, um dos estágios do processo de produção da alumina, a indústria iniciou trabalhos para melhoria.
+
+Dados Utilizados no Estudo do Tipo de Relacionamento Existente entre a Razão $Al_2O_3/NaOH$. Empregada no Processo Produtivo e o Teor de $Na_2O$ Ocluído na Alumina.
+
+```{r echo=FALSE}
+x <- c(0.647, 0.645, 0.650, 0.642, 0.643,
+       0.651, 0.640, 0.651, 0.648, 0.642,
+       0.643, 0.645, 0.639, 0.633, 0.642,
+       0.648, 0.639, 0.638, 0.641, 0.636,
+       0.638, 0.650, 0.649, 0.639, 0.633,
+       0.635)
+y <- c(0.43, 0.42, 0.44, 0.43, 0.42, 0.46,
+       0.43, 0.44, 0.43, 0.42, 0.41, 0.41,
+       0.40, 0.39, 0.40, 0.42, 0.40, 0.40,
+       0.41, 0.39, 0.39, 0.42, 0.43, 0.40,
+       0.39, 0.39)
+
+tabela <- data.frame(Razão = x, Teor = y)
+
+# Exibição formatada da tabela (usando knitr)
+knitr::kable(tabela, caption = "Tabela de Razão e Teor")
+```
+
+```{r include=FALSE}
+
+n <- if (length(x) == length(y)){
+  length(x)
+}else {
+  stop("Vetores de tamanhos diferentes")
+}
+
+sxy <- sum(x * y) - (sum(x) * sum(y)) / n
+
+sxx <- sum(x^2) - (sum(x)^2) / n
+
+syy <- sum(y^2) - (sum(y)^2) / n
+
+b <- sxy / sxx
+
+t_tab <- qt(0.025, df = n - 2, lower.tail = FALSE)
+
+s <- sqrt((syy - b * sxy) / (n - 2))
+```
+
+1.  Calcule o coeficiente de correlação de Pearson:
+
+    ```{r echo=FALSE}
+    r <- sqrt(b * sxy / syy)
+    r
+    ```
+
+2.  Verifique se a correlação encontrada no item (1) é válida para a população.
+
+    ```{r echo=FALSE}
+    rc_for_correlation <- function(value) {
+      if (value <= - t_tab || value >= t_tab) {
+        "Rejeita H0: Não existe correlação na população"
+      } else {
+        "Não rejeita H0: Existe correlação na população"
+      }
+    }
+
+    t_correlation <- r * sqrt((n - 2) / (1 - r^2))
+    t_correlation
+    rc_for_correlation(t_correlation)
+    ```
+
+Com um nível de significância de 5% e com com um teste t de correlacão, concluimos que há evidências estatísticas suficientes para rejeitar a hipótese de que não há correlacão na populacão.
+
+3.  Considerando o resultado do item a), como você avalia o relacionamento entre as variáveis?
+
+    ```{r echo=FALSE}
+    if (abs(r) >= 0.2 && abs(r) < 0.4) {
+      "Correlação fraca"
+    } else if (abs(r) >= 0.4 && abs(r) < 0.7) {
+      "Correlação moderada"
+    } else if (abs(r) >= 0.7 && abs(r) < 0.9) {
+      "Correlação forte"
+    } else {
+      "Sem correlação"
+    }
+    ```
+
+4.  Estabeleça a equação de regressão. E teste os coeficientes.
+
+    $$
+    \hat{y} = -1.4 + 2.93X
+    $$
+
+    ```{r echo=FALSE}
+    a <- mean(y) - b * mean(x)
+    b <- b
+
+    equation  <- function(x) {
+      a + b * x
+    }
+
+    rc_for_parameter <- function(value) {
+      if (value <= - t_tab || value >= t_tab) {
+        "Rejeita H0: O parâmetro é não significativo"
+      } else {
+        "Não rejeita H0: O parâmetro é significativo"
+      }
+    }
+
+    t_b <- (b - 0) / (s / sqrt(sxx))
+    t_b
+    rc_for_parameter(t_b)
+    ```
+
+    Com um nível de significância de 5% e com com um teste t para o parametro $\beta$, concluimos que há evidências estatísticas suficientes para rejeitar a hipótese de que o parâmetro é não significativo.
+
+5.  Apresente o diagrama de dispersão e a reta de regressão obtida em (4).
+
+    ```{r echo=FALSE}
+    ggplot2::ggplot() +
+      ggplot2::geom_point(ggplot2::aes(x = x, y = y))
+    ```
+
+6.  Você considera adequado o ajuste do modelo de regressão do item (4)? Dê uma medida desta adequação interpretando-a.
+
+    Pode ser usado o coefeciente de determinacão $0 < R^{2} < 1$ para verificar o quanto da variância total da variavel dependente (Y) é explicado pelas variáveis dependentes (X). Quanto mais próximo de 1 significa que o modelo está bem ajustado.
+
+    ```{r echo=FALSE}
+    r2 <- ((b^2 * sxx) / (syy)) * 100
+    r2
+    ```
+
+7.  Interprete o coeficiente angular (2).
+
+    O coeficiente indica a variacão do teor para cada unidade da razão. Neste caso, temos $2.93$ de variacão do teor para cada unidade da razão.
+
+8.  Qual o Teor de $Na_2O \%$ quando a Razão $Al_2O_3/NaOH$ for de 0.60?
+
+    ```{r echo=FALSE}
+    equation(0.60)
+    ```
+
+9.  Calcule o intervalo de confiança para $\alpha$ e $\beta$, com nível de confiança de 95%. Conclua corretamente.
+
+    ```{r echo=FALSE}
+    ic_a  <-  c(
+      a - t_tab * s * sqrt(1 / n + (mean(x)^2) / sxx),
+      a + t_tab * s * sqrt(1 / n + (mean(x)^2) / sxx)
+    )
+    ic_a
+
+    ic_b <- c(
+      b - t_tab * s * sqrt(1 / sxx),
+      b + t_tab * s * sqrt(1 / sxx)
+    )
+    ic_b
+    ```
+
+10. Calcule o intervalo de confiança para a resposta esperada no item (9).
+
+    ```{r echo=FALSE}
+    ic_eyx <- c(
+      equation(0.60) - t_tab * s * sqrt(1 / n + ((0.60 - mean(x))^2) / sxx),
+      equation(0.60) + t_tab * s * sqrt(1 / n + ((0.60 - mean(x))^2) / sxx)
+    )
+    ic_eyx
+    ```
+
+11. Calcule o intervalo de confiança para a previsão para o item (9).
+
+    ```{r echo=FALSE}
+    ic_yx <- c(
+      equation(0.60) - t_tab * s * sqrt(1 + 1 / n + ((0.60 - mean(x))^2) / sxx),
+      equation(0.60) + t_tab * s * sqrt(1 + 1 / n + ((0.60 - mean(x))^2) / sxx)
+    )
+    ic_yx
+
+    ```
+
+12. Cheque os resíduos, graficamente e por meio dos testes sugeridos em aula.
