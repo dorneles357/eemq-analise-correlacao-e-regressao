@@ -28,6 +28,8 @@ syy <- sum(y^2) - (sum(y)^2) / n
 
 b <- sxy / sxx
 
+a <- mean(y) - b * mean(x)
+
 t_tab <- qt(0.025, df = n - 2, lower.tail = FALSE)
 
 s <- sqrt((syy - b * sxy) / (n - 2))
@@ -35,6 +37,7 @@ s <- sqrt((syy - b * sxy) / (n - 2))
 # EXERCICIO 1
 
 r <- sqrt(b * sxy / syy)
+r
 
 # EXERCICIO 2
 
@@ -48,6 +51,7 @@ rc_for_correlation <- function(value) {
 
 t_correlation <- r * sqrt((n - 2) / (1 - r^2))
 
+t_correlation
 rc_for_correlation(t_correlation)
 
 # EXERCICIO 3
@@ -64,9 +68,6 @@ if (abs(r) >= 0.2 && abs(r) < 0.4) {
 
 # EXERCICIO 4
 
-a <- mean(y) - b * mean(x)
-b <- b
-
 equation  <- function(x) {
   a + b * x
 }
@@ -80,6 +81,8 @@ rc_for_parameter <- function(value) {
 }
 
 t_b <- (b - 0) / (s / sqrt(sxx))
+
+t_b
 rc_for_parameter(t_b)
 
 # EXERCICIO 5
@@ -122,6 +125,8 @@ ic_yx <- c(
   equation(0.60) + t_tab * s * sqrt(1 + 1 / n + ((0.60 - mean(x))^2) / sxx)
 )
 ic_yx
+
+# EXERCICIO 11
 
 ic_eyx <- c(
   equation(0.60) - t_tab * s * sqrt(1 / n + ((0.60 - mean(x))^2) / sxx),
