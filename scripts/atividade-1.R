@@ -134,3 +134,37 @@ ic_eyx <- c(
 )
 ic_eyx
 
+# ANOVA
+
+sqm_reg <- b * sxy
+sqm_res <- syy - sqm_reg
+sqm_tot <- syy
+
+gl_reg <- 1
+gl_res <- n - 2
+gl_tot <- n - 1
+
+mqm_reg <- sqm_reg / gl_reg
+mqm_res <- sqm_res / gl_res
+
+f_observed <- mqm_reg / mqm_res
+f_tab <- qf(0.05, df1 = gl_reg, df2 = gl_res, lower.tail = FALSE)
+
+anova <- dplyr::tibble(
+  "SQM" = c(sqm_reg, sqm_res, sqm_tot),
+  "GL" = c(gl_reg, gl_res, gl_tot),
+  "MQM" = c(mqm_reg, mqm_res, NA),
+  "F observado" = c(f_observed, NA, NA),
+  "F tabela" = c(f_tab, NA, NA)
+)
+
+print(anova)
+
+rc_anova_test <- function(value) {
+  if (value >= f_tab) {
+    "Rejeita H0: O modelo é não significativo (b = 0)"
+  } else {
+    "Não rejeita H0: O modelo é significativo (b != 0)"
+  }
+}
+rc_anova_test(f_observed)
