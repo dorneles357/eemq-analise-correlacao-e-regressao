@@ -168,3 +168,14 @@ rc_anova_test <- function(value) {
   }
 }
 rc_anova_test(f_observed)
+
+# CORRELAÇÃO COM FUNÇÃO COR
+
+cor(x, y)
+
+#MODELO COM FUNÇÃO LM
+
+df <- dplyr::tibble(x = x, y = y)
+model <- lm(y ~ x, data = as.data.frame(df))
+
+summary(model)
