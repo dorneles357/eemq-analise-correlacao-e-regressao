@@ -46,3 +46,22 @@ f_table <- data.frame(
   F_tab = c(f_tab, NA, NA)
 )
 f_table
+
+# R-squared calculation
+r_squared <- (ss_model / ss_total) * 100
+r_squared
+
+# R-squared adjusted calculation
+r_squared_adj <- (1 - ((ss_residual/gl_residual) / (ss_total/gl_total))) * 100
+r_squared_adj
+
+# test for coefficients
+matrix_c <- t(diag(matrix_x_xt_inv))
+
+for (i in 1:ncol(matrix_c)) {
+  se_beta_i <- sqrt(ms_residual * matrix_c[i])
+  t_cal <- beta_hat[i] / se_beta_i
+  t_tab <- qt(0.975, gl_residual)
+  
+  cat("Coeficiente b", i - 1, ": t_cal =", t_cal, ", t_tab =", t_tab, "\n")
+}
